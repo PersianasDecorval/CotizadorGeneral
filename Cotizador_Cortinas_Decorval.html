@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotizador de Cortinas</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f6f8;color:#222}
+.container{max-width:760px;margin:30px auto;padding:18px}
+h1{text-align:center;margin-bottom:22px}
+.card{background:#fff;border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+label{display:block;font-weight:600;margin-bottom:7px}
+select,input{width:100%;padding:12px;border:1px solid #ccc;border-radius:9px;font-size:16px;background:#fff}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.metric{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.metric small{color:#666}
+.metric strong{display:block;font-size:21px;margin-top:7px}
+.total{background:#eef5ff;border-radius:14px;padding:22px;text-align:center;margin-bottom:16px}
+.total small{font-weight:bold}
+.total-value{font-size:34px;font-weight:bold;margin:6px 0}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{border:0;border-radius:10px;padding:14px;font-size:16px;font-weight:bold;cursor:pointer}
+.copy{background:#1769aa;color:#fff}
+.clear{background:#e7e7e7;color:#222}
+.message{text-align:center;margin-top:12px;color:#1769aa;min-height:20px}
+@media(max-width:600px){
+ .grid,.grid3,.metrics,.buttons{grid-template-columns:1fr}
+ .container{margin:10px auto;padding:12px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Cotizador de Cortinas</h1>
+
+<div class="card">
+<div class="grid">
+<div>
+<label for="style">Estilo de cortina</label>
+<select id="style">
+<option value="ondulado">Ondulado Perfecto</option>
+<option value="ojillo">Cortina de Ojillo</option>
+<option value="plitz">Cortina Plitz</option>
+</select>
+</div>
+<div>
+<label for="product">Tela</label>
+<select id="product"></select>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="grid3">
+<div>
+<label for="width">Ancho (m)</label>
+<input id="width" type="number" min="0" step="0.01" placeholder="Ej. 1.50">
+</div>
+<div>
+<label for="height">Alto (m)</label>
+<input id="height" type="number" min="0" step="0.01" placeholder="Ej. 2.00">
+</div>
+<div>
+<label for="quantity">Cantidad</label>
+<input id="quantity" type="number" min="1" step="1" value="1">
+</div>
+</div>
+</div>
+
+<div class="card">
+<label for="discount">Descuento</label>
+<select id="discount">
+<option value="20">20%</option>
+<option value="25">25%</option>
+<option value="30">30%</option>
+</select>
+</div>
+
+<div class="metrics">
+<div class="metric"><small>Metros cuadrados</small><strong id="areaResult">0.00 m²</strong></div>
+<div class="metric"><small>Precio de lista</small><strong id="listResult">$0.00</strong></div>
+<div class="metric"><small>Descuento</small><strong id="discountResult">20%</strong></div>
+</div>
+
+<div class="total">
+<small>TOTAL CON DESCUENTO</small>
+<div class="total-value" id="totalResult">$0.00</div>
+<div id="savingResult">Ahorro: $0.00</div>
+</div>
+
+<div class="buttons">
+<button class="copy" id="copyBtn">📋 Copiar cotización</button>
+<button class="clear" id="clearBtn">🧹 Limpiar</button>
+</div>
+<div class="message" id="message"></div>
+</div>
+
+<script>
+const prices = {
+ ondulado:{
+  "Velvet":5813,"Nara":3500,"Lua":3188,"Night I":2813,"Night II":2813,
+  "Malt":2625,"Tulum":2625,
+  "Tergal Serenity":2317,"Greta":2317,"Ruby":2317,"Muller":2317,"Danna":2317,"Tergal Dining":2317,
+  "Dreamweave":2250,"Nightime":2250,"Asher":2250,
+  "Tergal Dotty":2150,"Tergal Rush":2150,"Tergal Limpkin":2150,"Tergal Sonne":2150,
+  "Tergal Lumina":2068,"Tergal Slide":2068,
+  "Tergal Lusso":1890,"Tergal Harmonic":1890,
+  "Tergal Terra":1750,"Tergal Gauze":1750,"Tergal Chifon":1750,
+  "Tergal Voile":1650
+ },
+ ojillo:{
+  "Night II":3338,"Dreamweave":2518,"Nightime":2328
+ },
+ plitz:{
+  "Velvet":4465,"Lua":3861,"Night II":3125,"Tulum":2840,
+  "Dreamweave":2550,"Nightime":2420,"Asher":2200
+ }
+};
+
+const styleNames={
+ ondulado:"Ondulado Perfecto",
+ ojillo:"Cortina de Ojillo",
+ plitz:"Cortina Plitz"
+};
+
+const $=id=>document.getElementById(id);
+const money=v=>v.toLocaleString("es-MX",{style:"currency",currency:"MXN",minimumFractionDigits:2});
+
+function updateProducts(){
+ const type=$("style").value;
+ $("product").innerHTML='<option value="">Selecciona una tela</option>';
+ Object.entries(prices[type])
+  .sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0],"es"))
+  .forEach(([name,price])=>{
+   const o=document.createElement("option");
+   o.value=price;
+   o.dataset.name=name;
+   o.textContent=`${name} — ${money(price)}/m²`;
+   $("product").appendChild(o);
+  });
+ calculate();
+}
+
+function calculate(){
+ const price=Number($("product").value)||0;
+ const w=Number($("width").value)||0;
+ const h=Number($("height").value)||0;
+ const qty=Math.max(1,Number($("quantity").value)||1);
+ const disc=Number($("discount").value)||0;
+ const area=w*h*qty;
+ const list=area*price;
+ const saving=list*disc/100;
+ const total=list-saving;
+
+ $("areaResult").textContent=area.toFixed(2)+" m²";
+ $("listResult").textContent=money(list);
+ $("discountResult").textContent=disc+"%";
+ $("totalResult").textContent=money(total);
+ $("savingResult").textContent="Ahorro: "+money(saving);
+
+ return {price,w,h,qty,disc,area,list,saving,total};
+}
+
+$("style").addEventListener("change",updateProducts);
+$("product").addEventListener("change",calculate);
+$("discount").addEventListener("change",calculate);
+["width","height","quantity"].forEach(id=>$(id).addEventListener("input",calculate));
+
+$("copyBtn").addEventListener("click",()=>{
+ const r=calculate();
+ const selected=$("product").options[$("product").selectedIndex];
+ const tela=selected?.dataset.name||"";
+ if(!tela || r.area<=0){
+  $("message").textContent="Selecciona el estilo, la tela e ingresa las medidas para copiar la cotización.";
+  return;
+ }
+ const text=`COTIZACIÓN
+
+Estilo: ${styleNames[$("style").value]}
+Tela: ${tela}
+Medidas: ${r.w.toFixed(2)} m × ${r.h.toFixed(2)} m
+Cantidad: ${r.qty}
+Área total: ${r.area.toFixed(2)} m²
+Precio de lista: ${money(r.list)}
+Descuento: ${r.disc}%
+Ahorro: ${money(r.saving)}
+TOTAL: ${money(r.total)}`;
+
+ if(navigator.clipboard && window.isSecureContext){
+  navigator.clipboard.writeText(text).then(()=>{
+   $("message").textContent="✓ Cotización copiada. Ya puedes pegarla en WhatsApp.";
+  }).catch(()=>fallbackCopy(text));
+ }else fallbackCopy(text);
+});
+
+function fallbackCopy(text){
+ const area=document.createElement("textarea");
+ area.value=text;
+ area.style.position="fixed";
+ area.style.left="-9999px";
+ document.body.appendChild(area);
+ area.select();
+ let ok=false;
+ try{ok=document.execCommand("copy")}catch(e){}
+ document.body.removeChild(area);
+ $("message").textContent=ok?"✓ Cotización copiada. Ya puedes pegarla en WhatsApp.":"No se pudo copiar automáticamente.";
+}
+
+$("clearBtn").addEventListener("click",()=>{
+ $("style").value="ondulado";
+ $("discount").value="20";
+ $("width").value="";
+ $("height").value="";
+ $("quantity").value="1";
+ $("message").textContent="";
+ updateProducts();
+});
+
+updateProducts();
+</script>
+</body>
+</html>

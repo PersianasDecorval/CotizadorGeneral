@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cotizador Proveedor | Persianas Decorval</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:#f3f6f9;color:#17324d;padding:20px}
+.c{width:min(900px,100%);margin:auto;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #d8e0e8}
+.header{background:#0759a8;color:#fff;padding:16px;text-align:center}
+.header h1{margin:0;font-size:21px}.header p{margin:6px 0 0;font-size:13px;opacity:.9}
+.form{padding:16px}
+.grid{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end}
+label{display:block;margin:0 0 7px;font-weight:800;color:#0759a8;font-size:15px}
+input,select{width:100%;padding:13px 13px;border-width:2px;border:1.5px solid #cbd9e8;border-radius:10px;background:#fff;color:#17324d;font-size:15px;outline:none}
+input:focus,select:focus{border-color:#0b6dcc;box-shadow:0 0 0 3px rgba(11,109,204,.12)}
+button{border:0;border-radius:10px;padding:12px 15px;font-size:14px;font-weight:700;cursor:pointer}
+.add{background:#0b63b5;color:#fff;white-space:nowrap;font-size:15px;padding:14px 18px;box-shadow:0 4px 9px rgba(11,99,181,.25)}
+.tablebox{margin:0 24px 18px;border:1px solid #d9e9f8;border-radius:8px;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th{background:#eef6ff;color:#17476f;font-size:13px;padding:11px 9px;text-align:center}
+td{padding:10px 8px;border-top:1px solid #e5edf5;text-align:center;font-size:14px}
+.remove{background:#fbe9e9;color:#b32626;padding:7px 10px}
+.empty{text-align:center;color:#718195;padding:24px}
+.summary{margin:0 24px 24px;background:#f4f9ff;border:1px solid #d9e9f8;border-radius:8px;padding:18px}
+.summarygrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.card{background:#fff;border:1px solid #e0ebf5;border-radius:8px;padding:12px;text-align:center}
+.card span{display:block;color:#64768a;font-size:12px;margin-bottom:5px}.card b{font-size:24px}
+.total{color:#0a8f3d}.publico{color:#c62828}
+.actions{display:flex;gap:10px;margin-top:15px}
+.clear{background:#eef2f6;color:#526273;flex:1}
+.note{text-align:center;color:#718195;font-size:12px;margin-top:13px}
+@media(max-width:700px){
+ .grid{grid-template-columns:1fr 1fr}.product{grid-column:1/-1}.add{width:100%}
+ .summarygrid{grid-template-columns:1fr}
+}
+@media(max-width:430px){body{padding:8px}.form,.summary{padding:16px;margin-left:12px;margin-right:12px}.tablebox{margin-left:12px;margin-right:12px}.grid{grid-template-columns:1fr}}
+
+/* Refuerzo visual de las áreas enmarcadas */
+.form{
+  background:#ffffff;
+  border:3px solid #0b63b5;
+  border-radius:16px;
+  margin:18px 24px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(11,99,181,.12);
+}
+.current-result{
+  background:#e9f5ff !important;
+  border:3px solid #0b63b5 !important;
+  box-shadow:0 5px 14px rgba(11,99,181,.18);
+}
+.summary{
+  border:3px solid #0b63b5 !important;
+  box-shadow:0 5px 14px rgba(11,99,181,.14);
+}
+.tablebox{
+  border:3px solid #0b63b5 !important;
+  box-shadow:0 4px 12px rgba(11,99,181,.10);
+}
+
+</style>
+</head>
+<body>
+<div class="c">
+<div class="header">
+<h1>PERSIANAS DECORVAL</h1>
+<p>COSTO DE PROVEEDOR</p>
+</div>
+
+<div class="form">
+<div class="grid">
+<div class="product">
+<label for="producto">Producto</label>
+<select id="producto">
+<option value="380">Enrollable - $380</option>
+<option value="460">Básica - $460</option>
+<option value="540">Intermedia - $540</option>
+<option value="625">Intermedia Plus - $625</option>
+<option value="660">Premium - $660</option>
+<option value="1100">Aluminio - $1100</option>
+<option value="2950">Madera - $2950</option>
+<option value="250">Reposición Enrollable - $250</option>
+<option value="300">Reposición Básica - $300</option>
+<option value="351">Reposición Intermedia - $351</option>
+<option value="410">Reposición Intermedia Plus - $410</option>
+<option value="430">Reposición Premium - $430</option>
+</select>
+</div>
+<div>
+<label for="ancho">Ancho (m)</label>
+<input id="ancho" type="number" step="0.01" min="0" placeholder="1.20" oninput="calculoEnVivo()">
+</div>
+<div>
+<label for="alto">Alto (m)</label>
+<input id="alto" type="number" step="0.01" min="0" placeholder="1.50" oninput="calculoEnVivo()">
+</div>
+<div>
+<button class="add" onclick="agregar()">＋ Agregar persiana</button>
+</div>
+<div id="preview" style="grid-column:1/-1;display:none;margin-top:4px;background:#f6f8fa;border:1px solid #dce3e9;border-radius:8px;padding:10px 12px">
+  <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <span><b>Área:</b> <span id="previewArea">0.00</span> m²</span>
+    <span><b>Costo proveedor:</b> <strong id="previewCosto" style="color:#0a8f3d">$0.00</strong></span>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="tablebox">
+<table>
+<thead>
+<tr><th>#</th><th>Producto</th><th>Ancho</th><th>Alto</th><th>Área</th><th>Costo/m²</th><th>Costo proveedor</th><th></th></tr>
+</thead>
+<tbody id="lista">
+<tr><td colspan="8" class="empty">Agrega la primera persiana para comenzar la cotización.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="currentCalc" class="current-result" style="margin:0 24px 16px;background:#eef7ff;border:1px solid #cfe4f7;border-radius:12px;padding:16px;text-align:center">
+<div style="font-size:13px;color:#52718d;font-weight:700">RESULTADO INMEDIATO</div>
+<div style="margin-top:6px;font-size:16px"><b id="currentProduct">Enrollable</b></div>
+<div style="margin-top:6px"><b>Área:</b> <span id="currentArea">0.00</span> m²</div>
+<div style="margin-top:5px"><b>Costo proveedor:</b> <strong id="currentCost" style="color:#0a8f3d;font-size:28px">$0.00</strong></div>
+</div>
+<div class="summary">
+<div class="summarygrid">
+<div class="card"><span>Total de persianas</span><b id="cantidad">0</b></div>
+<div class="card"><span>Área total</span><b id="areaTotal">0.00 m²</b></div>
+<div class="card"><span>Costo proveedor</span><b class="total" id="total">$0.00</b></div>
+</div>
+<div class="card" style="margin-top:10px">
+<span>Costo al Público de reposiciones (100%)</span><b class="publico" id="publico">$0.00</b>
+</div>
+<div class="actions">
+<button class="clear" onclick="borrarTodo()">Borrar toda la cotización</button>
+</div>
+<div class="note">El resumen superior incluye todos los modelos. El costo al público inferior calcula únicamente reposiciones. Se aplica un mínimo de 1 m² por persiana.</div>
+</div>
+</div>
+
+<script>
+const productoEl=document.getElementById('producto');
+const anchoEl=document.getElementById('ancho');
+const altoEl=document.getElementById('alto');
+const listaEl=document.getElementById('lista');
+let persianas=[];
+
+function m(n){return n.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+function calculoEnVivo(){
+  const a=parseFloat(anchoEl.value)||0;
+  const h=parseFloat(altoEl.value)||0;
+  const p=+productoEl.value;
+  const nombre=productoEl.options[productoEl.selectedIndex].text.replace(/ - \$[\d,\.]+$/,'');
+  let area=0,costo=0;
+  if(a>0&&h>0){
+    const bruta=a*h;
+    area=(bruta<1)?1:bruta;
+    costo=area*p;
+  }
+  document.getElementById('currentProduct').textContent=nombre;
+  document.getElementById('currentArea').textContent=m(area);
+  document.getElementById('currentCost').textContent='$'+m(costo);
+}
+
+function agregar(){
+ const a=parseFloat(anchoEl.value)||0;
+ const h=parseFloat(altoEl.value)||0;
+ if(a<=0||h<=0){
+   alert('Ingresa un ancho y un alto válidos.');
+   return;
+ }
+ const p=+productoEl.value;
+ const nombre=productoEl.options[productoEl.selectedIndex].text.replace(/ - \$[\d,\.]+$/,'');
+ const areaBruta=a*h;
+ const area=(areaBruta>0&&areaBruta<1)?1:areaBruta;
+ const costo=area*p;
+
+ persianas.push({nombre,a,h,area,p,costo});
+ anchoEl.value='';
+ altoEl.value='';
+ document.getElementById('preview').style.display='none';
+ render();
+ anchoEl.focus();
+}
+
+function render(){
+ if(persianas.length===0){
+   listaEl.innerHTML='<tr><td colspan="8" class="empty">Agrega la primera persiana para comenzar la cotización.</td></tr>';
+ }else{
+   listaEl.innerHTML=persianas.map((x,i)=>`
+   <tr>
+    <td>${i+1}</td>
+    <td style="text-align:left"><b>${x.nombre}</b></td>
+    <td>${m(x.a)} m</td>
+    <td>${m(x.h)} m</td>
+    <td>${m(x.area)} m²</td>
+    <td>$${m(x.p)}</td>
+    <td><b>$${m(x.costo)}</b></td>
+    <td><button class="remove" onclick="eliminar(${i})">Eliminar</button></td>
+   </tr>`).join('');
+ }
+ // Los tres indicadores superiores suman TODOS los modelos.
+  const cantidad=persianas.length;
+  const areaTotal=persianas.reduce((s,x)=>s+x.area,0);
+  const total=persianas.reduce((s,x)=>s+x.costo,0);
+
+  document.getElementById('cantidad').textContent=cantidad;
+  document.getElementById('areaTotal').textContent=m(areaTotal)+' m²';
+  document.getElementById('total').textContent='$'+m(total);
+
+  // Solo el precio al público inferior corresponde a reposiciones.
+  const reposiciones=persianas.filter(x=>x.nombre.toLowerCase().startsWith('reposición'));
+  const totalReposiciones=reposiciones.reduce((s,x)=>s+x.costo,0);
+  document.getElementById('publico').textContent='$'+m(totalReposiciones*2);
+}
+
+function eliminar(i){persianas.splice(i,1);render();}
+
+function borrarTodo(){
+ if(persianas.length && !confirm('¿Borrar toda la cotización?')) return;
+ persianas=[];
+ render();
+ anchoEl.value='';
+ altoEl.value='';
+ document.getElementById('preview').style.display='none';
+}
+
+[anchoEl,altoEl].forEach(el=>el.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    agregar();
+  }
+}));
+productoEl.addEventListener('change', calculoEnVivo);
+anchoEl.addEventListener('input', calculoEnVivo);
+altoEl.addEventListener('input', calculoEnVivo);
+calculoEnVivo();
+
+productoEl.addEventListener('change', calculoEnVivo);
+anchoEl.addEventListener('input', calculoEnVivo);
+altoEl.addEventListener('input', calculoEnVivo);
+calculoEnVivo();
+</script>
+</body>
+</html>
