@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Persianas Decorval - Cotizadores</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Arial,sans-serif;
+  background:#f3f4f6;
+  color:#123;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:25px;
+}
+.contenedor{
+  width:min(920px,100%);
+  background:#fff;
+  border-radius:22px;
+  box-shadow:0 8px 30px rgba(0,0,0,.12);
+  padding:35px;
+  text-align:center;
+}
+.logo{
+  width:105px;
+  height:105px;
+  object-fit:contain;
+  border-radius:50%;
+  margin-bottom:12px;
+}
+h1{
+  margin:0;
+  color:#0057b8;
+  font-size:34px;
+}
+.subtitulo{
+  margin:8px 0 28px;
+  color:#333;
+  font-size:19px;
+}
+.linea{
+  height:4px;
+  background:#0057b8;
+  border-radius:4px;
+  margin:0 auto 28px;
+  width:100px;
+}
+.opciones{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+.tarjeta{
+  text-decoration:none;
+  color:#fff;
+  background:#0057b8;
+  border-radius:16px;
+  padding:25px 18px;
+  min-height:155px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  transition:.2s;
+  box-shadow:0 5px 14px rgba(0,87,184,.2);
+}
+.tarjeta:hover{
+  transform:translateY(-4px);
+  background:#004a9d;
+}
+.icono{font-size:42px;margin-bottom:10px}
+.titulo{font-size:20px;font-weight:bold}
+.descripcion{font-size:14px;margin-top:7px;opacity:.95}
+.pie{
+  margin-top:28px;
+  color:#666;
+  font-size:13px;
+}
+@media(max-width:700px){
+  .contenedor{padding:25px 18px}
+  h1{font-size:28px}
+  .opciones{grid-template-columns:1fr}
+  .tarjeta{min-height:125px}
+}
+</style>
+</head>
+<body>
+<div class="contenedor">
+  <img class="logo" src="https://persianasdecorval.github.io/cotizador-decorval/logo.png" alt="Persianas Decorval" onerror="this.style.display='none'">
+  <h1>PERSIANAS DECORVAL</h1>
+  <div class="subtitulo">Selecciona el cotizador que deseas utilizar</div>
+  <div class="linea"></div>
+
+  <div class="opciones">
+    <a class="tarjeta" href="Cotizador_General.html">
+      <div class="icono">🏠</div>
+      <div class="titulo">Cotizador General</div>
+      <div class="descripcion">Cotización completa de productos</div>
+    </a>
+
+    <a class="tarjeta" href="5%20PERSIANAS.html">
+      <div class="icono">🪟</div>
+      <div class="titulo">5 PERSIANAS</div>
+      <div class="descripcion">Cotizador de persianas</div>
+    </a>
+
+    <a class="tarjeta" href="Multiproductos.html">
+      <div class="icono">📦</div>
+      <div class="titulo">MULTIPRODUCTOS</div>
+      <div class="descripcion">Cotizador de múltiples productos</div>
+    </a>
+  </div>
+
+  <div class="pie">Persianas Decorval · Cotizadores</div>
+</div>
+</body>
+</html>
